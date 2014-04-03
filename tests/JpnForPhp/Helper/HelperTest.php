@@ -18,12 +18,13 @@ use JpnForPhp\Helper\Helper;
  */
 class HelperTest extends \PHPUnit_Framework_TestCase
 {
+    protected $mixCharacters = '今日、Joo「ジョオ」は学校にいます。';
+    protected $kanjiCharacters = '漢字';
+    protected $hiraganaCharacters = 'ひらがな';
+    protected $katakanaCharacters = 'カタカナ';
+
     protected function setUp()
     {
-        $this->mixCharacters = '今日、Joo「ジョオ」は学校にいます。';
-        $this->kanjiCharacters = '漢字';
-        $this->hiraganaCharacters = 'ひらがな';
-        $this->katakanaCharacters = 'カタカナ';
         parent::setUp();
     }
 
@@ -153,21 +154,57 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, 'OoUuAaIioOuUaAiIeE');
     }
 
-    public function testExtractKanjiLiteralsWhenKanjiOnly()
+    public function testExtractKanjiCharactersWhenKanjiOnly()
     {
         $result = Helper::extractKanjiCharacters($this->kanjiCharacters);
         $this->assertEquals($result, array('漢', '字'));
     }
 
-    public function testExtractKanjiLiteralsWhenMixed()
+    public function testExtractKanjiCharactersWhenMixed()
     {
         $result = Helper::extractKanjiCharacters($this->mixCharacters);
         $this->assertEquals($result, array('今', '日', '学', '校'));
     }
 
-    public function testExtractKanjiWhenNoKanjis()
+    public function testExtractKanjiCharactersWhenNoKanjis()
     {
         $result = Helper::extractKanjiCharacters($this->hiraganaCharacters);
         $this->assertEquals($result, array());
     }
+
+    public function testExtractHiraganaCharactersWhenHiraganaOnly()
+    {
+        $result = Helper::extractHiraganaCharacters($this->hiraganaCharacters);
+        $this->assertEquals($result, array('ひ', 'ら', 'が', 'な'));
+    }
+
+    public function testExtractHiraganaCharactersWhenMixed()
+    {
+        $result = Helper::extractHiraganaCharacters($this->mixCharacters);
+        $this->assertEquals($result, array('は', 'に', 'い', 'ま', 'す'));
+    }
+
+    public function testExtractHiraganaCharactersWhenNoHiraganas()
+    {
+        $result = Helper::extractHiraganaCharacters($this->katakanaCharacters);
+        $this->assertEquals($result, array());
+    }
+
+    public function testExtractKatakanaCharactersWhenKatakanaOnly()
+    {
+        $result = Helper::extractKatakanaCharacters($this->katakanaCharacters);
+        $this->assertEquals($result, array('カ', 'タ', 'カ', 'ナ'));
+    }
+
+    public function testExtractKatakanaCharactersWhenMixed()
+    {
+        $result = Helper::extractKatakanaCharacters($this->mixCharacters);
+        $this->assertEquals($result, array('ジョ', 'オ'));
+    }
+
+    public function testExtractKatakanaCharactersWhenNoKatakanas()
+    {
+        $result = Helper::extractKatakanaCharacters($this->hiraganaCharacters);
+        $this->assertEquals($result, array());
+    }    
 }

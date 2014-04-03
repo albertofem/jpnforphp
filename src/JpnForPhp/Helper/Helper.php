@@ -28,6 +28,8 @@ class Helper
     const PREG_PATTERN_NOT_KATAKANA = '/[^\p{Katakana}ー]/u';
     const PREG_PATTERN_PUNCTUATION_MARKS = '/[、，：・。！？‥「」『』（）｛｝［］【】〜〽]/u';
 
+    const PREG_PATTERN_KATAKANA_YOUN = "/ャ|ュ|ョ/u";
+
     /**
      * Enhance default splitter function to handle UTF-8 characters.
      *
@@ -93,15 +95,15 @@ class Helper
     }
 
     /**
-     * Split a given string to extract kanji literals
+     * Split a given string to extract kanji characters
      *
      * @param string $str The input string
      *
-     * @return array An array of kanji literals
+     * @return array An array of kanji characters
      */
     public static function extractKanjiCharacters($str)
     {
-        return preg_split("//u", preg_replace(self::PREG_PATTERN_NOT_KANJI, "", $str), -1, PREG_SPLIT_NO_EMPTY);
+        return self::split(preg_replace(self::PREG_PATTERN_NOT_KANJI, "", $str));
     }
 
     /**
@@ -116,6 +118,11 @@ class Helper
         return preg_split(self::PREG_PATTERN_NOT_HIRAGANA, $str, 0, PREG_SPLIT_NO_EMPTY);
     }
 
+    public static function extractHiraganaCharacters($str)
+    {
+        return self::split(preg_replace(self::PREG_PATTERN_NOT_HIRAGANA, "", $str));
+    }
+
     /**
      * Split a given string to extract katakana substrings.
      *
@@ -126,6 +133,22 @@ class Helper
     public static function extractKatakana($str)
     {
         return preg_split(self::PREG_PATTERN_NOT_KATAKANA, $str, 0, PREG_SPLIT_NO_EMPTY);
+    }
+
+    public static function extractKatakanaCharacters($str)
+    {
+        $characters = self::split(preg_replace(self::PREG_PATTERN_NOT_KATAKANA, "", $str));
+
+        foreach($characters as $key => $character)
+        {
+            if(preg_match(self::PREG_PATTERN_KATAKANA_YOUN, $character))
+            {
+                $characters[$key-1] = $characters[$key-1] . $character;
+                unset($characters[$key]);
+            }
+        }
+
+        return array_values($characters);
     }
 
     /**
